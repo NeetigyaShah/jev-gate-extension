@@ -91,8 +91,13 @@ h4 { margin: 12px 0 4px; font-size: 11px; text-transform: uppercase; letter-spac
 <option value="~typesafe/jev-latest" selected>~typesafe/jev-latest</option>
 </select>
 <div class="actions"><button id="orcheck">Check Jev</button></div>
-<label>Text model · writes form values (Jev cannot)</label>
-<input id="textmodel" placeholder="deepseek/deepseek-v4-flash-0731" autocomplete="off" />
+<label>Text model provider · writes form values (Jev cannot)</label>
+<select id="textprovider">
+<option value="groq" selected>Groq</option>
+<option value="openrouter">OpenRouter</option>
+</select>
+<label>Text model</label>
+<input id="textmodel" placeholder="qwen/qwen3.8-27b" autocomplete="off" />
 <label>Goal</label>
 <input id="goal" placeholder="e.g. open second latest email" />
 <div class="actions">

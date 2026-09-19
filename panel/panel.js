@@ -62,6 +62,14 @@ $('textmodel').addEventListener('change', (e) => {
   chrome.storage.local.set({ textModel: e.target.value.trim() });
   log(`Text model set to ${e.target.value.trim()}.`);
 });
+$('textprovider').addEventListener('change', (e) => {
+  const provider = e.target.value;
+  chrome.storage.local.set({ textProvider: provider });
+  // Suggest the model that is known to answer directly on this provider.
+  const fallback = provider === 'groq' ? 'qwen/qwen3.8-27b' : 'deepseek/deepseek-v4-flash-0731';
+  $('textmodel').placeholder = fallback;
+  log(`Text model provider set to ${provider}. Default model: ${fallback}.`);
+});
 
 $('orcheck').onclick = async () => {
   const model = $('ormodel').value;
@@ -524,7 +532,7 @@ $('wake').addEventListener('change', () => {
   if (voice.running) setVoiceState(machine.listening ? 'armed' : 'idle', machine.listening ? 'Listening for the goal…' : `Listening for "${words[0]}"…`);
 });
 
-chrome.storage.local.get(['wakeWords', 'voiceAuto', 'voiceSpeak', 'sttLang', 'silenceMs', 'groqKey', 'sttModel', 'alwaysOn']).then((s) => {
+chrome.storage.local.get(['wakeWords', 'voiceAuto', 'voiceSpeak', 'sttLang', 'silenceMs', 'groqKey', 'sttModel', 'alwaysOn', 'textProvider', 'textModel']).then((s) => {
   if (Array.isArray(s.wakeWords) && s.wakeWords.length) {
     $('wake').value = s.wakeWords.join(', ');
     machine.setWakeWords(s.wakeWords);
@@ -535,6 +543,9 @@ chrome.storage.local.get(['wakeWords', 'voiceAuto', 'voiceSpeak', 'sttLang', 'si
   if (s.silenceMs) { $('silence').value = s.silenceMs; machine.silenceMs = s.silenceMs; }
   if (s.groqKey) $('groqkey').value = s.groqKey;
   if (s.sttModel) $('sttmodel').value = s.sttModel;
+  if (s.textProvider) $('textprovider').value = s.textProvider;
+  if (s.textModel) $('textmodel').value = s.textModel;
+  if (s.textProvider === 'openrouter') $('textmodel').placeholder = 'deepseek/deepseek-v4-flash-0731';
   if (s.alwaysOn) {
     // A reload tears down the offscreen document; bring the listener back.
     $('alwaysOn').checked = true;

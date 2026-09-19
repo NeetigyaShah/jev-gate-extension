@@ -84,13 +84,33 @@ the sentence.
 Listening can also run with the panel closed, through an offscreen document.
 That is the only way to keep a microphone open when no panel is on screen.
 
+## Models
+
+Three models do three different jobs, and keeping them apart is most of the
+design.
+
+The **decisions model** is Jev, reached through OpenRouter's decisions endpoint.
+It only ever answers fixed questions, so it cannot invent an action.
+
+The **text model** writes the value for a `TYPE_TEXT` step, because Jev cannot
+emit a string at all. It runs on Groq by default with `qwen/qwen3.8-27b`, which
+was measured answering in about 11 milliseconds with a clean value and no
+reasoning overhead. OpenRouter remains selectable. A reasoning model is a poor
+fit here: `openai/gpt-oss-20b` spends its whole output budget thinking and
+returns an empty value, so the panel reports that plainly instead of typing
+nothing.
+
+The **speech model** is Groq Whisper, transcribing the recorded goal.
+
 ## Install
 
 1. Open `chrome://extensions`, turn on Developer mode, and choose
    **Load unpacked**. Point it at this folder.
 2. Open the side panel and paste an OpenRouter key. Jev runs through the
    decisions endpoint at `~typesafe/jev-latest`.
-3. Optionally paste a Groq key to have spoken goals transcribed by Whisper.
+3. Optionally paste a Groq key. It powers both the text model, which writes
+   values into fields, and Whisper, which transcribes spoken goals. With it,
+   the OpenRouter key is needed only for the decisions model.
 4. Type a goal, press **Step once** to watch a single decision, or **Auto** to
    let it run.
 
@@ -178,5 +198,5 @@ design was learned. The confidence gate, the stop rules, the snapshot layer, and
 the voice front end are this project's own, and none of the upstream projects
 listed here were written by this project's author.
 
-Speech to text is Groq Whisper. Speech synthesis in the panel uses the browser's
-own engine.
+Speech to text is Groq Whisper, and the text model runs on Groq by default.
+Speech synthesis in the panel uses the browser's own engine.
