@@ -226,7 +226,10 @@ async function transcribe({ audioB64, mime, lang }) {
     form.append('model', sttModel || 'whisper-large-v3-turbo');
     form.append('response_format', 'json');
     form.append('temperature', '0');
-    if (lang) form.append('language', lang);
+    // Whisper accepts ISO-639-1 only ("en"); Chrome's recogniser wants the full
+    // tag ("en-IN"). Passing the tag through returns 400 unsupported language.
+    const iso = String(lang || '').split('-')[0].trim().toLowerCase();
+    if (iso) form.append('language', iso);
     const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${groqKey}` },
